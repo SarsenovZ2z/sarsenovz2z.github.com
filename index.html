@@ -7,7 +7,8 @@
                 min-height: 100%;
             }
             body {
-                background-color: black;
+                height: 100%;
+                background-color: white;
             }
             div {
                 text-align: center;
@@ -16,15 +17,116 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
                 font-size: 100px;
-                color: gold;
+                color: lightblue;
                 font-weight: 800;
             }
+            ul {
+                display: inline-block;
+                list-style-type: none;
+            }
+            ul li {
+                border: 2px solid lightblue;
+                border-radius: 5%;
+                background-color: rgba(200,250,150 ,0.5);
+                margin-left: -3px;
+                display: block;
+                float: left;
+            }
+            ul li:nth-child(odd):not(.first):not(.last) {
+                animation-name: odd_imitate;
+                animation-duration: 1s;
+                animation-delay: 3.5s;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+            }
+            ul li:nth-child(even) {
+                animation-name: even_imitate;
+                animation-duration: 0.5s;
+                animation-delay: 3.5s;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+            }
+            .first {
+                animation-duration: 1s;
+                animation-delay: 2s;
+                animation-name: toLeft;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+            }
+            .last {
+                animation-duration: 1s;
+                animation-delay: 3s;
+                animation-name: toRight;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+            }
 
+            @keyframes odd_imitate {
+                from {
+                    transform: translate(0px, 0px);
+                }
+                to {
+                    transform: translate(8px, 3px);
+                }
+            }
+
+            @keyframes even_imitate {
+                from {
+                    transform: translate(0, 0);
+                }
+                to {
+                    transform: translate(2px, 3px);
+                }
+            }
+
+            @keyframes toLeft {
+                0% {
+                    transform: rotate(0deg) translate(0px, 0px);
+                }
+                45% {
+                    transform: rotate(0deg) translate(1px, 0px);
+                }
+                50% {
+                    transform: rotate(-3deg) translate(10px, -2px);
+                }
+                100% {
+                    transform: rotate(60deg) translate(-200px, 0px);
+                }
+            }
+
+            @keyframes toRight {
+                0% {
+                    transform: rotate(0deg) translate(0px, 0px);
+                }
+                45% {
+                    transform: rotate(0deg) translate(-1px, 0px);
+                }
+                50% {
+                    transform: rotate(3deg) translate(-10px, -2px);
+                }
+                100% {
+                    transform: rotate(-60deg) translate(200px, 0px);
+                }
+            }
         </style>
     </head>
     <body>
         <div>
-            Hello:)
+            <ul>
+                <li class="first">H</li>
+                <li>E</li>
+                <li>L</li>
+                <li>L</li>
+                <li class="last">O</li>
+            </ul>
         </div>
+        <script>
+            window.onload = function () {
+                var ul = document.getElementsByTagName("ul")[0];
+                var li = ul.children;
+                var first = li[0];
+                var last = li[li.length-1];
+            };
+        </script>
     </body>
 </html>
