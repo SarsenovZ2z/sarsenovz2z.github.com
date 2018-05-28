@@ -1,129 +1,164 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Z2z</title>
+    <meta charset="utf-8"/>
+    <title></title>
+    </head>
         <style>
+            * {
+                padding: 0;
+                margin: 0;
+            }
             html {
+                min-width: 100%;
                 min-height: 100%;
             }
-            body {
-                height: 100%;
-                background-color: white;
-            }
-            div {
-                text-align: center;
+            #wrapper {
                 position: relative;
                 top: 50%;
                 left: 50%;
+                width: 100%;
+                height: 100%;
+                background-color: transparent;
                 transform: translate(-50%, -50%);
-                font-size: 100px;
-                color: black;
-                font-weight: 800;
             }
-            ul {
-                display: inline-block;
-                list-style-type: none;
+            canvas {
+                position: relative;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                z-index: -1;
             }
-            ul li {
-                margin-left: -3px;
-                display: block;
-                float: left;
-            }
-            ul li:nth-child(odd):not(.first):not(.last) {
-                animation-name: odd_imitate;
-                animation-duration: 1s;
-                animation-delay: 3.5s;
-                animation-iteration-count: infinite;
-                animation-direction: alternate;
-            }
-            ul li:nth-child(even) {
-                animation-name: even_imitate;
-                animation-duration: 0.5s;
-                animation-delay: 3.5s;
-                animation-iteration-count: infinite;
-                animation-direction: alternate;
-            }
-            .first {
-                animation-duration: 1s;
-                animation-delay: 2s;
-                animation-name: toLeft;
-                animation-iteration-count: infinite;
-                animation-direction: alternate;
-            }
-            .last {
-                animation-duration: 1s;
-                animation-delay: 3s;
-                animation-name: toRight;
-                animation-iteration-count: infinite;
-                animation-direction: alternate;
+            img {
+                display: none;
             }
 
-            @keyframes odd_imitate {
-                from {
-                    transform: translate(0px, 0px);
-                }
-                to {
-                    transform: translate(8px, 3px);
-                }
-            }
-
-            @keyframes even_imitate {
-                from {
-                    transform: translate(0, 0);
-                }
-                to {
-                    transform: translate(2px, 3px);
-                }
-            }
-
-            @keyframes toLeft {
-                0% {
-                    transform: rotate(0deg) translate(0px, 0px);
-                }
-                45% {
-                    transform: rotate(0deg) translate(1px, 0px);
-                }
-                50% {
-                    transform: rotate(-3deg) translate(10px, -2px);
-                }
-                100% {
-                    transform: rotate(60deg) translate(-200px, 0px);
-                }
-            }
-
-            @keyframes toRight {
-                0% {
-                    transform: rotate(0deg) translate(0px, 0px);
-                }
-                45% {
-                    transform: rotate(0deg) translate(-1px, 0px);
-                }
-                50% {
-                    transform: rotate(3deg) translate(-10px, -2px);
-                }
-                100% {
-                    transform: rotate(-60deg) translate(200px, 0px);
-                }
-            }
         </style>
     </head>
     <body>
-        <div>
-            <ul>
-                <li class="first">H</li>
-                <li>E</li>
-                <li>L</li>
-                <li>L</li>
-                <li class="last">O</li>
-            </ul>
+        <img src = "https://images.alphacoders.com/898/thumb-1920-898735.jpg"/>
+        <div id="wrapper">
+            <canvas class="particles"></canvas>
         </div>
         <script>
-            window.onload = function () {
-                var ul = document.getElementsByTagName("ul")[0];
-                var li = ul.children;
-                var first = li[0];
-                var last = li[li.length-1];
-            };
+            var canvas;
+            var ctx;
+            var particles;
+            var pRadius = 0.8;
+            var pSpeed = 2;
+            var pOpacity = 0.05;
+            var it = 0;
+            var itSpeed = 2;
+            var leftOff;
+            var topOff;
+
+            window.addEventListener("DOMContentLoaded", function() {
+                init();
+            });
+
+            function init() {
+                canvas = document.getElementsByClassName("particles")[0];
+                canvas.width = document.getElementById("wrapper").offsetWidth;
+                canvas.height = document.getElementById("wrapper").offsetHeight;
+                leftOff = (canvas.width - 100)/2;
+                topOff = (canvas.height - 60)/2;
+                ctx = canvas.getContext("2d");
+                createParticles();
+                canvas.addEventListener("click", function() {
+                    window.requestAnimationFrame(animate);
+                });
+            }
+
+            function createParticles() {
+                it = leftOff;
+                particles = [];
+                for (var i=pRadius+leftOff;i<=canvas.width -leftOff - pRadius;i+=(2*pRadius)) {
+                    for (var j=pRadius+topOff;j<=canvas.height - topOff - pRadius;j+=(2*pRadius)) {
+                        var t = new Particle(i, j, Rand()*pSpeed, Rand()*pSpeed);
+                        t.draw();
+                        particles.push(t);
+                    }
+                }
+                fillText();
+            }
+
+            function fillText() {
+                ctx.save();
+                ctx.fillStyle = "black";
+                ctx.fillRect(it, topOff, canvas.width-leftOff-it, canvas.height-2*topOff);
+                ctx.restore();
+                ctx.save();
+                ctx.fillStyle = "white";
+                ctx.font="20px Arial";
+                ctx.textAlign="center";
+                ctx.textBaseline="middle";
+                ctx.fillText("Hello ; )", canvas.width/2, canvas.height/2);
+                ctx.restore();
+            }
+
+            function animate() {
+                var cnt = 0;
+                ctx.save();
+                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.restore();
+                if (canvas.width-leftOff-it>0) {
+                    fillText();
+                }
+                particles.forEach(function(particle, index) {
+                    if (particle.opacity>0) {
+                        if (particle.coords.x+pRadius<=it) {
+                            particle.start = true;
+                            particle.draw();
+                        }
+                        cnt++;
+                    }
+                });
+
+                it+=itSpeed;
+                itSpeed-=0.01*Rand();
+
+                if (cnt) {
+                    window.requestAnimationFrame(animate);
+                }
+                else {
+                    ctx.save();
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                    createParticles();
+                }
+            }
+
+
+            function Particle(xCoord = 0, yCoord = 0, vxVel = 0, vyVel = 0, op = 1) {
+                this.coords = {x: xCoord, y: yCoord};
+                this.speed = {vx: vxVel, vy: vyVel};
+                this.radius = pRadius;
+                this.opacity = op;
+                this.start = false;
+                this.update = function() {
+                    this.coords.x+=this.speed.vx;
+                    this.coords.y+=this.speed.vy;
+                    this.speed.vx+=0.1*Rand();
+                    this.speed.vy+=Math.abs(0.5*Rand());
+                    this.opacity-=pOpacity;
+                };
+                this.draw = function() {
+                    if (this.start)
+                        this.update();
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.fillStyle = "rgba(0, 0, 0, "+this.opacity+")";
+                    ctx.arc(this.coords.x, this.coords.y, this.radius, 0, 2*Math.PI);
+                    ctx.fill();
+                    ctx.restore();
+                };
+            }
+
+            function Rand() {
+                return (Math.random()*2>=1?1:-1)*Math.random();
+            }
+
         </script>
     </body>
 </html>
