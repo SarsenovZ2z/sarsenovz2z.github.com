@@ -42,12 +42,13 @@
             var canvas;
             var ctx;
             var particles;
-            var pRadius = 4;
+            var pRadius = 2.5;
             var pSpeed = 3;
             var pOpacity = 0.012;
             var it = 0;
             var itSpeed = 1;
             var _itSpeed = itSpeed;
+            var rSpeed = 0.15;
             var leftOff;
             var topOff;
             var buttonWidth = 200;
@@ -80,7 +81,7 @@
                 particles = [];
                 for (var i=pRadius+leftOff;i<=canvas.width -leftOff - pRadius;i+=(2*pRadius)) {
                     for (var j=pRadius+topOff;j<=canvas.height - topOff - pRadius;j+=(2*pRadius)) {
-                        var t = new Particle(i, j, Rand()*pSpeed, Rand()*pSpeed);
+                        var t = new Particle(i, j, 0, 0);
                         t.draw();
                         particles.push(t);
                     }
@@ -105,9 +106,9 @@
             function animate() {
                 var cnt = 0;
                 ctx.save();
-                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                // ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                // ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 ctx.restore();
                 if (canvas.width-leftOff-it>0) {
@@ -116,7 +117,11 @@
                 particles.forEach(function(particle, index) {
                     if (particle.opacity>0) {
                         if (particle.coords.x+pRadius<=it || particle.start) {
-                            particle.start = true;
+                            if (!particle.start) {
+                                particle.speed.vx = Rand()*pSpeed + Rand()*pSpeed*itSpeed;
+                                particle.speed.vy = Rand()*pSpeed + Rand()*pSpeed*itSpeed;
+                                particle.start = true;
+                            }
                             particle.draw();
                         }
                         cnt++;
@@ -146,6 +151,8 @@
                 this.opacity = op;
                 this.start = false;
                 this.update = function() {
+                    this.radius+=Math.abs(Rand()*rSpeed);
+                    this.radius = Math.max(0, this.radius);
                     this.coords.x+=this.speed.vx;
                     this.coords.y+=this.speed.vy;
                     this.speed.vx+=0.1*Rand();
