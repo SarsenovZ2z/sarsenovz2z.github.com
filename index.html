@@ -52,6 +52,7 @@
             var topOff;
             var buttonWidth = 200;
             var buttonHeight = 100;
+            var clicked = false;
 
             window.addEventListener("DOMContentLoaded", function() {
                 init();
@@ -66,7 +67,10 @@
                 ctx = canvas.getContext("2d");
                 createParticles();
                 canvas.addEventListener("click", function() {
-                    window.requestAnimationFrame(animate);
+                    if (!clicked) {
+                        window.requestAnimationFrame(animate);
+                        clicked = true;
+                    }
                 });
             }
 
@@ -130,6 +134,7 @@
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.restore();
                     createParticles();
+                    clicked = false;
                 }
             }
 
