@@ -81,7 +81,7 @@
                     }
                 }
                 ctx.restore();
-                if (Rand(0, 200) >= 198)
+                if (Rand(0, 200) >= 197)
                 {
                     animatable.push(new Particle());
                 }
@@ -89,7 +89,7 @@
             }
 
 
-            function Particle(x = Rand(150, canvas.width-150), y = canvas.height+100, speed_x = Rand(-2, 2), speed_y = Rand(30, 35), radius = Rand(0.4, 1), color = getRandomColor(), eHeight = canvas.height*Rand(0.2, 0.7))
+            function Particle(x = Rand(150, canvas.width-150), y = canvas.height+100, speed_x = Rand(-5, 5), speed_y = Rand(40, 100), radius = Rand(0.1, 0.5), color = getRandomColor(), eHeight = canvas.height*Rand(0.2, 0.7))
             {
                 this.x = x;
                 this.y = y;
@@ -183,27 +183,20 @@
                     for (var j = 0;j<360;j++)
                     {
                         let i = Rand(0, 360, true);
-                        // if (j>=90 && j<=270) {
-                        //     this.radius = 1/(2+Math.sin(j));
-                        // }
-                        // else {
-                        //     this.radius = 1/(2-Math.sin(j));
-                        // }
-                        let old_x = this.x+this.oldSize*Math.cos(i)*Math.cos(j);
-                        let old_y = this.y+this.oldSize*Math.sin(i)*Math.cos(j);
-                        let x = this.x+this.size*Math.cos(i)*Math.cos(j);
-                        let y = this.y+this.size*Math.sin(i)*Math.cos(j);
+                        this.radius = 1/(2-Math.sin(j));
+                        // let old_x = this.x+this.oldSize*Math.cos(i)*Math.cos(j);
+                        // let old_y = this.y+this.oldSize*Math.sin(i)*Math.cos(j);
                         ctx.save();
                         ctx.beginPath();
                         ctx.fillStyle = this.color;
-                        ctx.arc(x, y, this.radius, 0, 2*Math.PI);
+                        ctx.arc(this.x+this.size*Math.cos(i)*Math.cos(j), this.y+this.size*Math.sin(i)*Math.cos(j), this.radius, 0, 2*Math.PI);
                         ctx.fill();
-                        ctx.beginPath();
-                        ctx.strokeStyle = getRandomColor();
-                        ctx.lineWidth = 2*this.radius;
-                        ctx.moveTo(old_x, old_y);
-                        ctx.lineTo(x, y);
-                        ctx.stroke();
+                        // ctx.beginPath();
+                        // ctx.strokeStyle = getRandomColor();
+                        // ctx.lineWidth = 2*this.radius;
+                        // ctx.moveTo(old_x, old_y);
+                        // ctx.lineTo(x, y);
+                        // ctx.stroke();
                         ctx.restore();
                     }
                 }
@@ -220,7 +213,7 @@
 
             function getRandomColor()
             {
-                return "rgb("+Rand(50, 255, true)+", "+Rand(50, 255, true)+", "+Rand(50, 255, true)+")";
+                return "rgb("+Rand(100, 255, true)+", "+Rand(100, 255, true)+", "+Rand(100, 255, true)+")";
             }
 
         </script>
