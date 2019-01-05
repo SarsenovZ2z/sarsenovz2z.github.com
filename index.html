@@ -26,6 +26,7 @@
                 top: 50%;
                 transform: translate(-50%, -50%);
                 z-index: -1;
+                background-color: black;
             }
             img {
                 display: none;
@@ -41,139 +42,184 @@
         <script>
             var canvas;
             var ctx;
-            var particles;
-            var pRadius = 2.5;
-            var pSpeed = 3;
-            var pOpacity = 0.02;
-            var it = 0;
-            var itSpeed = 1.75;
-            var _itSpeed = itSpeed;
-            var rSpeed = 0.15;
-            var leftOff;
-            var topOff;
-            var buttonWidth = 200;
-            var buttonHeight = 100;
-            var clicked = false;
+            var animatable = [];
 
-            window.addEventListener("DOMContentLoaded", function() {
+            window.addEventListener("DOMContentLoaded", function()
+            {
                 init();
             });
 
-            function init() {
+            function init()
+            {
                 canvas = document.getElementsByClassName("particles")[0];
                 canvas.width = document.getElementById("wrapper").offsetWidth;
                 canvas.height = document.getElementById("wrapper").offsetHeight;
-                leftOff = (canvas.width - buttonWidth)/2;
-                topOff = (canvas.height - buttonHeight)/2;
                 ctx = canvas.getContext("2d");
-                createParticles();
-                canvas.addEventListener("click", function() {
-                    if (!clicked) {
-                        window.requestAnimationFrame(animate);
-                        clicked = true;
-                    }
-                });
+                animatable.push(new Particle());
+                animate();
             }
 
-            function createParticles() {
-                it = leftOff;
-                itSpeed = _itSpeed;
-                particles = [];
-                for (var i=pRadius+leftOff;i<=canvas.width -leftOff - pRadius;i+=(2*pRadius)) {
-                    for (var j=pRadius+topOff;j<=canvas.height - topOff - pRadius;j+=(2*pRadius)) {
-                        var t = new Particle(i, j, 0, 0);
-                        t.draw();
-                        particles.push(t);
+            function animate()
+            {
+                ctx.save();
+                ctx.beginPath();
+                ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (var i = 0;i<animatable.length;++i)
+                {
+                    if (animatable[i].destroy)
+                    {
+                        animatable[i].explode();
+                        animatable.splice(i, 1);
+                        i--;
+                    }
+                    else
+                    {
+                        animatable[i].draw();
                     }
                 }
-                fillText();
-            }
-
-            function fillText() {
-                ctx.save();
-                ctx.fillStyle = "black";
-                ctx.fillRect(it, topOff, canvas.width-leftOff-it, canvas.height-2*topOff);
                 ctx.restore();
-                ctx.save();
-                ctx.fillStyle = "white";
-                ctx.font="50px Arial";
-                ctx.textAlign="center";
-                ctx.textBaseline="middle";
-                ctx.fillText("Hello ; )", canvas.width/2, canvas.height/2);
-                ctx.restore();
-            }
-
-            function animate() {
-                var cnt = 0;
-                ctx.save();
-                // ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-                // ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                ctx.restore();
-                if (canvas.width-leftOff-it>0) {
-                    fillText();
+                if (Rand(0, 200) >= 198)
+                {
+                    animatable.push(new Particle());
                 }
-                particles.forEach(function(particle, index) {
-                    if (particle.opacity>0) {
-                        if (particle.coords.x+pRadius<=it || particle.start) {
-                            if (!particle.start) {
-                                particle.speed.vx = Rand()*pSpeed + Rand()*pSpeed*itSpeed;
-                                particle.speed.vy = Rand()*pSpeed + Rand()*pSpeed*itSpeed;
-                                particle.start = true;
-                            }
-                            particle.draw();
-                        }
-                        cnt++;
+                window.requestAnimationFrame(animate);
+            }
+
+
+            function Particle(x = Rand(150, canvas.width-150), y = canvas.height+100, speed_x = Rand(-2, 2), speed_y = Rand(30, 35), radius = Rand(0.4, 1), color = getRandomColor(), eHeight = canvas.height*Rand(0.2, 0.7))
+            {
+                this.x = x;
+                this.y = y;
+                this.speed_x = speed_x;
+                this.speed_y = speed_y;
+                this.radius = radius;
+                this.color = color;
+                this.explodeHeight = eHeight;
+                // this.next = Rand(0, 2, true)==1?new Particle(x, y, Rand(-2, 2), speed_y+Rand(-1, 1), radius, getRandomColor(), eHeight+Rand(-20, 20)):false;
+                this.destroy = false;
+
+                this.explode = function()
+                {
+                    animatable.push(new fractions(this.x, this.y, this.color));
+                    // if (this.next)
+                    // {
+                    //     window.setTimeout(this.registerNext.bind(null, this.next), 2500+Rand(0, 500));
+                    // }
+                }
+
+                // this.registerNext = function(p)
+                // {
+                //     animatable.push(p);
+                // }
+
+                this.update = function()
+                {
+                    this.x+=this.speed_x;
+                    this.y-=this.speed_y;
+                    this.speed_y-=1;
+                    if (this.y<=this.explodeHeight || this.old_y-this.y<5)
+                    {
+                        this.destroy = true;
                     }
-                });
-
-                it+=itSpeed;
-                itSpeed-=0.3*Rand();
-                itSpeed = Math.abs(itSpeed);
-                itSpeed = Math.min(_itSpeed, itSpeed);
-                if (cnt) {
-                    window.requestAnimationFrame(animate);
                 }
-                else {
+
+                this.draw = function()
+                {
+                    this.old_x = this.x;
+                    this.old_y = this.y;
+                    this.update();
+
                     ctx.save();
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                    createParticles();
-                    clicked = false;
-                }
-            }
 
-
-            function Particle(xCoord = 0, yCoord = 0, vxVel = 0, vyVel = 0, op = 1) {
-                this.coords = {x: xCoord, y: yCoord};
-                this.speed = {vx: vxVel, vy: vyVel};
-                this.radius = pRadius;
-                this.opacity = op;
-                this.start = false;
-                this.update = function() {
-                    this.radius+=Math.abs(Rand()*rSpeed);
-                    this.radius = Math.max(0, this.radius);
-                    this.coords.x+=this.speed.vx;
-                    this.coords.y+=this.speed.vy;
-                    this.speed.vx+=0.1*Rand();
-                    this.speed.vy+=Math.abs(0.5*Rand());
-                    this.opacity-=pOpacity;
-                };
-                this.draw = function() {
-                    if (this.start)
-                        this.update();
-                    ctx.save();
                     ctx.beginPath();
-                    ctx.fillStyle = "rgba(0, 0, 0, "+this.opacity+")";
-                    ctx.arc(this.coords.x, this.coords.y, this.radius, 0, 2*Math.PI);
+                    ctx.fillStyle = this.color;
+                    ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
                     ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2*this.radius;
+                    ctx.moveTo(this.old_x, this.old_y);
+                    ctx.lineTo(this.x, this.y);
+                    ctx.stroke();
+
                     ctx.restore();
-                };
+                }
             }
 
-            function Rand() {
-                return (Math.random()*2>=1?1:-1)*Math.random();
+            function fractions(x, y, color=getRandomColor(), speed = Rand(15, 25), maxSize = Rand(250, 350))
+            {
+                this.x = x;
+                this.y = y;
+                this.size = 0;
+                this.radius = 0.1;
+                this.maxSize = maxSize;
+                this.speed = speed;
+                this.color = color;
+                this.destroy = false;
+
+                this.explode = function()
+                {
+
+                }
+
+                this.update = function()
+                {
+                    this.size+=this.speed;
+                    this.speed-=this.speed/8;
+                    if (this.size>=this.maxSize || this.speed<=0.5)
+                    {
+                        this.destroy = true;
+                    }
+                }
+
+                this.draw = function()
+                {
+                    this.oldSize = this.size;
+                    this.update();
+                    for (var j = 0;j<360;j++)
+                    {
+                        let i = Rand(0, 360, true);
+                        // if (j>=90 && j<=270) {
+                        //     this.radius = 1/(2+Math.sin(j));
+                        // }
+                        // else {
+                        //     this.radius = 1/(2-Math.sin(j));
+                        // }
+                        let old_x = this.x+this.oldSize*Math.cos(i)*Math.cos(j);
+                        let old_y = this.y+this.oldSize*Math.sin(i)*Math.cos(j);
+                        let x = this.x+this.size*Math.cos(i)*Math.cos(j);
+                        let y = this.y+this.size*Math.sin(i)*Math.cos(j);
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.fillStyle = this.color;
+                        ctx.arc(x, y, this.radius, 0, 2*Math.PI);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.strokeStyle = getRandomColor();
+                        ctx.lineWidth = 2*this.radius;
+                        ctx.moveTo(old_x, old_y);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+
+
+
+            function Rand(min, max, floor=false)
+            {
+                if (floor)
+                    return Math.floor(1+Math.random() * (max - min) + min);
+                return Math.random() * (max - min) + min;
+            }
+
+            function getRandomColor()
+            {
+                return "rgb("+Rand(50, 255, true)+", "+Rand(50, 255, true)+", "+Rand(50, 255, true)+")";
             }
 
         </script>
