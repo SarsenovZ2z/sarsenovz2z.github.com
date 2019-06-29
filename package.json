@@ -1,0 +1,14 @@
+{
+    "devDependencies": {
+        "watchify": "~0.1.0",
+        "catw": "~0.0.1"
+    },
+    "scripts": {
+        "build-js": "browserify resources/js/main.js | uglifyjs -mc > public/js/app.js",
+        "build-css": "cat resources/css/*.css > public/css/app.css",
+        "build": "npm run build-js && npm run build-css",
+        "watch-js": "watchify resources/js/*.js -o public/js/app.js -dv",
+        "watch-css": "catw resources/css/*.css -o public/css/app.css -v",
+        "watch": "npm run watch-js & npm run watch-css"
+    }
+}
