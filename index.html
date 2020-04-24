@@ -21,7 +21,7 @@
         const print = function(message) {
             var p = document.createElement('p');
             p.innerHTML = message;
-            log.prependChild(p);
+            log.prepend(p);
         }
 
         document.addEventListener("webkitvisibilitychange", function(e) {
