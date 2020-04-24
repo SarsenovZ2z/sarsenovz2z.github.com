@@ -1,11 +1,44 @@
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <title>WebGL</title>
-        <link rel="stylesheet" type="text/css" href="public/css/app.css"/>
-    </head>
-    <body>
+<head>
+    <title>hello</title>
+    <style>
+        body {
+            min-width: 100vw;
+            min-width: 100vh;
+            background-color: blue;
+        }
+        #log {
+            color: white;
 
-        <script src="public/js/app.js"></script>
-    </body>
+        }
+    </style>
+</head>
+<body>
+    <div id="log"></div>
+    <script>
+        var log = document.getElementById('log');
+
+        const print = function(message) {
+            var p = document.createElement('p');
+            p.innerHTML = message;
+            log.appendChild(p);
+        }
+
+        document.addEventListener("webkitvisibilitychange", function(e) {
+            print('visibilitychange');
+        });
+        document.addEventListener("keydown", function(e) {
+            print('Keyboard: ' + e.key);
+        });
+        window.addEventListener("resize", function() {
+            print('Resize');
+        });
+        window.addEventListener("blur", function() {
+            print('Blur');
+        });
+        window.addEventListener("focus", function() {
+            print('Focus');
+        });
+    </script>
+</body>
 </html>
