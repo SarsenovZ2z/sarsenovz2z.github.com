@@ -1,6 +1,6 @@
 {
     "devDependencies": {
-        "watchify": "~0.1.0",
+        "watchify": "~4.0.0",
         "catw": "~0.0.1"
     },
     "scripts": {
